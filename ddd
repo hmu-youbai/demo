@@ -1,0 +1,145 @@
+import Levenshtein as L
+import numpy as np
+def DNA_complement1(sequence):
+    comp_dict = {
+        "A":"T",
+        "T":"A",
+        "G":"C",
+        "C":"G",
+        "a":"t",
+        "t":"a",
+        "g":"c",
+        "c":"g",
+        "u":"a",
+        "N":"N"
+    }
+    sequence_list = list(sequence)
+    sequence_list = [comp_dict[base] for base in sequence_list]
+    sequence_list.reverse()
+    string = ''.join(sequence_list)
+    return string
+def yichucuowu(aaa,bbb):
+    bbbindex = np.nonzero(np.array(np.fromstring(aaa, dtype=np.uint8) ^ np.fromstring(bbb, dtype=np.uint8)))[0]
+    if len(bbbindex)>1:
+        dd = bbb[:bbbindex[1]]
+    else:
+        dd=bbb
+    return dd
+def check(str1, str2):
+    length1 = len(str1)
+    length = min(length1, len(str2))
+    k = max(range(0, length + 1),
+            key=lambda i: i if L.hamming(str1[length1-i:], str2[:i])<2  else False)
+    return str2[:k],k
+def quchong(r1name,r2name,jieguo):
+    num = 0
+    r1 = []
+    with open(r1name, 'r') as file1:
+        for line in file1:
+            num = num + 1
+            if (num % 4) == 2:
+                r1.append(line.strip())
+    file1.close()
+    num = 0
+    r2 = []
+    with open(r2name, 'r') as file2:
+        for line in file2:
+            num = num + 1
+            if (num % 4) == 2:
+                r2.append(line.strip())
+    file2.close()
+    cc1 = []
+    for i in range(len(r1)):
+        cc1.append(r1[i] + "@" + r2[i])
+    cc2 = list(dict.fromkeys(cc1))
+
+    with open(jieguo, 'w') as file3:
+        result = []
+        for i in range(len(cc2)):
+            nn = "name" + str(i)
+            result.append(nn + " " + cc2[i].split("@")[0] + " " + cc2[i].split("@")[1])
+            print(nn + " " + cc2[i].split("@")[0] + " " + cc2[i].split("@")[1], file=file3)
+    file3.close()
+    return result
+def fastazhuanhuan(qiming_fasta,bidui):
+    out_file = qiming_fasta
+    fin = open(bidui, 'r')
+    fout = open(out_file, 'w')
+    i = 0
+    for line in fin:
+        i += 1
+        line = line.strip()
+        eles = line.split()
+        r1_seq = eles[0]
+        r2_seq = eles[1]
+        print('%s%d%s%s' % (">", i, "_", r1_seq), file=fout)
+        print('%s' % (r2_seq), file=fout)
+    fin.close()
+    fout.close()
+def overlap666(se111,se222,se333,over,file_object,file_object2,file_object4):
+    rrr1 = se111.replace("C", "T")
+    rrr2 = se222.replace("C", "T")
+    zjjs = int((len(se111) + len(se222) - int(over[1])) / 2)
+    wzc = (len(se111) + len(se222) - int(over[1])) / 2
+    if zjjs > min(len(se111), len(se222)):
+        zjjs = min(len(se111), len(se222))
+    rrr1 = rrr1[:zjjs]
+    rrr2 = rrr2[:zjjs]
+    yzover = yichucuowu(rrr1, rrr2)
+    if len(yzover) > 35:
+        print(str(se333) + " " + se222[:len(yzover)] + " " + str(wzc), file=file_object)
+        print(str(se333) + " " + se222[:len(yzover)], file=file_object2)
+    else:
+        print(str(se333) + " " + se222[:len(yzover)], file=file_object4)
+def print10w(o):
+    o = o + 1
+    if o % 100000 == 0:
+        print(o)
+def report1(yuanshir1,r1r2quchong,qiehaoder2):
+    with open(yuanshir1, 'r') as y1,open(r1r2quchong, 'r') as y2,open(qiehaoder2,
+    'r') as y3,open(qiehaoder2+"overlow35", 'r') as y4,open(qiehaoder2+"wuover", 'r') as y5:
+        lly1 = len(y1.readlines())/4
+        lly2 = len(y2.readlines())
+        lly3 = len(y3.readlines())
+        lly4 = len(y4.readlines())
+        lly5 = len(y5.readlines())
+        print("原始文件read数为："+str(int(lly1))+"\n"+"去除重复后read数为："+str(lly2)+"\n"+"存在overlap且r2长度大于35的read数："+str(lly3)
+              +"\n"+"存在overlap且r2长度小于35的read数："+str(lly4)+"\n"+"不存在overlap的read数："+str(lly5))
+def qier2(quchong,beiyong,bidui):
+    o = 0
+    with open(quchong, 'r') as oioi, open(beiyong, 'w') as file_object, open(bidui,'w') as file_object2,open(bidui+"wuover",'w') as file_object3,open(bidui+"overlow35",'w') as file_object4:
+        for line in oioi:
+            o = o + 1
+            if o % 100000 == 0:
+                print(o)
+            line = line.strip()
+            ppp = line.split()
+            se333 = ppp[0]
+            se111 = ppp[1]
+            se222 = ppp[2]
+            over = check(se111, DNA_complement1(se222))
+            if len(over[0]) < 6:
+                print(str(se333) + " " + se222, file=file_object3)
+            else:
+                overlap666(se111, se222, se333, over, file_object, file_object2, file_object4)
+
+    oioi.close()
+    file_object.close()
+    file_object2.close()
+    file_object3.close()
+    file_object4
+    fastazhuanhuan(bidui + ".fasta", bidui)
+    fastazhuanhuan(bidui + "wuover" + ".fasta", bidui + "wuover")
+############请起名
+yuanshir1="CGS-ES-2_1p.fq"
+yuanshir2="CGS-ES-2_2p.fq"
+r1r2quchong="CGS-ES-R1R2"
+qiehaoder2="CGS-ES-cutr2"
+qiehaoder2beiyong="CGS-ES-cutr2beiyong"
+r1r2=quchong(yuanshir1,yuanshir2,r1r2quchong)
+qier2(r1r2quchong,qiehaoder2beiyong,qiehaoder2)
+report1(yuanshir1,r1r2quchong,qiehaoder2)
+###############   bowtie2 -x /data/wangzc/lianxi2/shushu1/shushu1 -f cutr2.fasta  -p 25   -S cutr2.sam
+
+
+
